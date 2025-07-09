@@ -1,14 +1,14 @@
 {
-  "name": "@juristr/ngx-lazy-el",
+  "name": "@radiomemory/ngx-lazy-el",
   "version": "1.0.1",
   "author": {
-    "name": "Juri Strumpflohner",
-    "url": "https://juristr.com",
-    "email": "info@juristr.com"
+    "name": "Radio Memory",
+    "url": "https://radiomemory.com",
+    "email": "desenvolvimento@radiomemory.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/juristr/ngx-lazy-el"
+    "url": "https://github.com/radiomemory/ngx-lazy-el"
   },
   "dependencies": {
     "tslib": "^2.0.0"
