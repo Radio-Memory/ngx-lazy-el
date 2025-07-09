@@ -151,8 +151,10 @@
   "warnings": {
       "versionMismatch": false
     },
-  "defaultCollection": "@nrwl/angular",
-  "packageManager": "yarn"
+  "packageManager": "yarn",
+  "schematicCollections": [
+    "@nrwl/angular"
+  ]
  },
  "schematics": {
   "@nrwl/schematics:application": {
@@ -168,6 +170,5 @@
   "@nrwl/schematics:node-application": {
    "framework": "express"
   }
- },
- "defaultProject": "demoapp"
+}
 }
