@@ -1,6 +1,7 @@
 {
   "name": "@radiomemory/ngx-lazy-el",
-  "version": "1.0.1",
+  "version": "2.0.1",
+  "description": "Angular 17+ compatible lazy loading library for custom elements",
   "author": {
     "name": "Radio Memory",
     "url": "https://radiomemory.com",
@@ -14,8 +15,15 @@
     "tslib": "^2.0.0"
   },
   "peerDependencies": {
-    "@angular/common": "^17.3.12",
-    "@angular/core": "^17.3.12",
-    "@angular/elements": "^17.3.12"
-  }
+    "@angular/common": "^17.0.0",
+    "@angular/core": "^17.0.0",
+    "@angular/elements": "^17.0.0"
+  },
+  "keywords": [
+    "angular",
+    "lazy-loading",
+    "custom-elements",
+    "web-components"
+  ],
+  "license": "MIT"
 }

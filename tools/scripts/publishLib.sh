@@ -4,4 +4,4 @@ yarn build:lib
 
 cd dist/libs/ngx-lazy-el
 npm login
-npm publish
+npm publish --access public
