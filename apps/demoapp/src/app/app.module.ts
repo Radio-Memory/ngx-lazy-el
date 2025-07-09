@@ -43,7 +43,7 @@ const lazyConfig = [
     SharedModule,
     NgxLazyElModule.forRoot(lazyConfig),
     NxModule.forRoot(),
-    RouterModule.forRoot([], { initialNavigation: 'enabled', relativeLinkResolution: 'legacy' }),
+    RouterModule.forRoot([], { initialNavigation: 'enabled' }),
     BrowserAnimationsModule,
     SimpleHelloWorldModule
     // HelloWorldModule
