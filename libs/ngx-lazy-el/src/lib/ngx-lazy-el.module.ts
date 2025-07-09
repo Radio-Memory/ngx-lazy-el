@@ -9,7 +9,7 @@ import { LAZY_CMPS_PATH_TOKEN } from './tokens';
   exports: [LazyLoadDirective]
 })
 export class NgxLazyElModule {
-  static forRoot(modulePaths: any[]): ModuleWithProviders {
+  static forRoot(modulePaths: any[]): ModuleWithProviders<NgxLazyElModule> {
     return {
       ngModule: NgxLazyElModule,
       providers: [
