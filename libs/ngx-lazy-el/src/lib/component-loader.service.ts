@@ -1,13 +1,7 @@
 import {
   Injectable,
-  NgModuleFactoryLoader,
   Injector,
-  Inject,
-  NgModuleRef,
-  Compiler,
-  NgModuleFactory,
-  Type,
-  ChangeDetectorRef
+  Inject
 } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { LazyComponentDef, LAZY_CMPS_PATH_TOKEN } from './tokens';
@@ -24,15 +18,12 @@ export class ComponentLoaderService {
   private elementsLoading = new Map<string, Promise<LazyCmpLoadedEvent>>();
 
   constructor(
-    // private loader: NgModuleFactoryLoader,
-    // private moduleRef: NgModuleRef<any>,
     private injector: Injector,
     @Inject(LAZY_CMPS_PATH_TOKEN)
     elementModulePaths: {
       selector: string;
       loadChildren: LoadChildrenCallback;
-    }[],
-    private compiler: Compiler
+    }[]
   ) {
     const ELEMENT_MODULE_PATHS = new Map<string, any>();
     elementModulePaths.forEach(route => {
@@ -119,62 +110,25 @@ export class ComponentLoaderService {
       const path = cmpRegistryEntry.loadChildren;
 
       const loadPromise = new Promise<LazyCmpLoadedEvent>((resolve, reject) => {
-        (path() as Promise<NgModuleFactory<any> | Type<any>>)
-          // this.loader
-          //   .load(path)
-          .then(elementModuleOrFactory => {
-            /**
-             * With View Engine, the NgModule factory is created and provided when loaded.
-             * With Ivy, only the NgModule class is provided loaded and must be compiled.
-             * This uses the same mechanism as the deprecated `SystemJsNgModuleLoader` in
-             * in `packages/core/src/linker/system_js_ng_module_factory_loader.ts`
-             * to pass on the NgModuleFactory, or compile the NgModule and return its NgModuleFactory.
-             */
-            if (elementModuleOrFactory instanceof NgModuleFactory) {
-              return elementModuleOrFactory;
+        (path() as Promise<any>)
+          .then(elementModule => {
+            let customElementComponent;
+
+            if (typeof elementModule.customElementComponent === 'object') {
+              customElementComponent =
+                elementModule.customElementComponent[componentTag];
+              if (!customElementComponent) {
+                throw `You specified multiple component elements in module ${elementModule} but there was no match for tag ${componentTag} in ${JSON.stringify(
+                  elementModule.customElementComponent
+                )}. Make sure the selector in the module is aligned with the one specified in the lazy module definition.`;
+              }
             } else {
-              try {
-                return this.compiler.compileModuleAsync(elementModuleOrFactory);
-              } catch (err) {
-                // return the error
-                reject(err);
-
-                // break the promise chain
-                throw err;
-              }
+              customElementComponent = elementModule.customElementComponent;
             }
-          })
-          .then(moduleFactory => {
-            try {
-              const elementModuleRef = moduleFactory.create(this.injector);
-              const injector = elementModuleRef.injector;
 
-              let customElementComponent;
-
-              if (
-                typeof elementModuleRef.instance.customElementComponent ===
-                'object'
-              ) {
-                customElementComponent =
-                  elementModuleRef.instance.customElementComponent[
-                    componentTag
-                  ];
-                if (!customElementComponent) {
-                  throw `You specified multiple component elements in module ${elementModuleRef} but there was no match for tag ${componentTag} in ${JSON.stringify(
-                    elementModuleRef.instance.customElementComponent
-                  )}. Make sure the selector in the module is aligned with the one specified in the lazy module definition.`;
-                }
-              } else {
-                customElementComponent =
-                  elementModuleRef.instance.customElementComponent;
-              }
-
-              const CustomElement = createCustomElement(
-                customElementComponent,
-                {
-                  injector
-                }
-              );
+            const CustomElement = createCustomElement(customElementComponent, {
+              injector: this.injector
+            });
 
               // define the Angular Element
               customElements!.define(componentTag, CustomElement);

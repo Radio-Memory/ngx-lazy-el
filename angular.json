@@ -178,9 +178,8 @@
  },
  "cli": {
   "warnings": {
-   "typescriptMismatch": false,
-   "versionMismatch": false
-  },
+      "versionMismatch": false
+    },
   "defaultCollection": "@nrwl/angular",
   "packageManager": "yarn"
  },
