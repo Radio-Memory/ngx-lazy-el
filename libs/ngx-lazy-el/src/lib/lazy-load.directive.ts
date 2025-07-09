@@ -59,15 +59,20 @@ export class LazyLoadDirective implements OnInit, OnDestroy {
       // .loadContainedCustomElements(this.elementRef.nativeElement)
       .loadContainedCustomElements(nodeTags)
       .subscribe(elements => {
+
+
         this.vcr.clear();
         this.vcr.createEmbeddedView(this.template);
 
         // try to get the element DOM
         let domInstance = null;
-        if (this.elementRef.nativeElement.parentElement) {
-          domInstance = this.elementRef.nativeElement.parentElement.querySelector(
-            elements[0].selector
-          );
+        if (this.elementRef.nativeElement.parentElement && elements && elements.length > 0) {
+          const firstElement = elements[0];
+          if (firstElement && firstElement.selector) {
+            domInstance = this.elementRef.nativeElement.parentElement.querySelector(
+              firstElement.selector
+            );
+          }
         }
 
         this.notifyComponentLoaded({

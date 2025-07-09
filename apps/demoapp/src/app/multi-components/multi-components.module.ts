@@ -8,7 +8,7 @@ import { Cmp2Component } from './cmp2.component';
     imports: [CommonModule]
 })
 export class MultiComponentsModule {
-  customElementComponent: { [prop: string]: Type<any> } = {
+  static customElementComponent: { [prop: string]: Type<any> } = {
     'juristr-cmp1': Cmp1Component,
     'juristr-cmp2': Cmp2Component
   };

@@ -9,10 +9,10 @@ import { NgxLazyElModule } from '@juristr/ngx-lazy-el';
 import { SimpleHelloWorldModule } from './simple-hello-world/simple-hello-world.module';
 
 const lazyConfig = [
-  {
-    selector: 'app-user-list',
-    loadChildren: () => import('./users/users.module').then(m => m.UsersModule)
-  },
+  // {
+  //   selector: 'app-user-list',
+  //   loadChildren: () => import('./users/users.module').then(m => m.UsersModule)
+  // },
   {
     selector: 'app-hello-world',
     loadChildren: () =>

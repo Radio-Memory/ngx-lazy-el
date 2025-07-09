@@ -70,18 +70,25 @@ export class ComponentLoaderService {
   loadContainedCustomElements(
     tags: string[]
   ): Observable<LazyCmpLoadedEvent[]> {
+
+
     const unregisteredSelectors = Array.from(
       this.componentsToLoad.keys()
     ).filter(s => tags.find(x => x.toLowerCase() === s.toLowerCase()));
+
+
 
     // already registered elements
     const alreadyRegistered = Array.from(this.loadedCmps.keys()).filter(s =>
       tags.find(x => x.toLowerCase() === s.toLowerCase())
     );
 
+
+
     // add the already registered in...elements won't be recreated
     // the "loadComponent(...)"
     unregisteredSelectors.push(...alreadyRegistered);
+
 
     // Returns observable that completes when all discovered elements have been registered.
     const allRegistered = Promise.all(
@@ -112,52 +119,76 @@ export class ComponentLoaderService {
 
       const loadPromise = new Promise<LazyCmpLoadedEvent>((resolve, reject) => {
         (path() as Promise<any>)
-          .then(elementModule => {
+          .then(elementModuleClass => {
+
             let customElementComponent;
 
-            if (typeof elementModule.customElementComponent === 'object') {
+            // elementModuleClass é a classe do módulo, não uma instância
+            // Precisamos acessar a propriedade customElementComponent da classe (agora estática)
+            if (typeof elementModuleClass.customElementComponent === 'object') {
               customElementComponent =
-                elementModule.customElementComponent[componentTag];
+                elementModuleClass.customElementComponent[componentTag];
               if (!customElementComponent) {
-                throw `You specified multiple component elements in module ${elementModule} but there was no match for tag ${componentTag} in ${JSON.stringify(
-                  elementModule.customElementComponent
+                throw `You specified multiple component elements in module ${elementModuleClass} but there was no match for tag ${componentTag} in ${JSON.stringify(
+                  elementModuleClass.customElementComponent
                 )}. Make sure the selector in the module is aligned with the one specified in the lazy module definition.`;
               }
             } else {
-              customElementComponent = elementModule.customElementComponent;
+              customElementComponent = elementModuleClass.customElementComponent;
             }
 
-            const CustomElement = createCustomElement(customElementComponent, {
-              injector: this.injector
-            });
+            if (!customElementComponent) {
+              throw new Error(
+                `No customElementComponent found in module ${elementModuleClass.name}. Make sure the module has a static customElementComponent property.`
+              );
+            }
 
-            // define the Angular Element
-            customElements!.define(componentTag, CustomElement);
-            customElements
-              .whenDefined(componentTag)
-              .then(() => {
-                // remember for next time
-                this.loadedCmps.set(componentTag, elementModule);
-                // instantiate the component
-                const componentInstance = createInstance
-                  ? document.createElement(componentTag)
-                  : null;
-                // const componentInstance = null;
-                resolve({
-                  selector: componentTag,
-                  componentInstance
-                });
-              })
-              .then(() => {
-                this.elementsLoading.delete(componentTag);
-                this.componentsToLoad.delete(componentTag);
-              })
-              .catch(err => {
-                this.elementsLoading.delete(componentTag);
-                return Promise.reject(err);
+
+
+            try {
+              const CustomElement = createCustomElement(customElementComponent, {
+                injector: this.injector
               });
+
+              // Verificar se customElements está disponível
+              if (typeof customElements === 'undefined') {
+                throw new Error('Custom Elements not supported in this environment');
+              }
+
+              // define the Angular Element
+              customElements!.define(componentTag, CustomElement);
+              customElements
+                .whenDefined(componentTag)
+                .then(() => {
+                  // remember for next time
+                  this.loadedCmps.set(componentTag, elementModuleClass);
+                  // instantiate the component
+                  const componentInstance = createInstance
+                    ? document.createElement(componentTag)
+                    : null;
+                  // const componentInstance = null;
+                  resolve({
+                    selector: componentTag,
+                    componentInstance
+                  });
+                })
+                .then(() => {
+                  this.elementsLoading.delete(componentTag);
+                  this.componentsToLoad.delete(componentTag);
+                })
+                .catch(err => {
+                  console.error('Error defining custom element:', err);
+                  this.elementsLoading.delete(componentTag);
+                  return Promise.reject(err);
+                });
+            } catch (err) {
+              console.error('Error creating custom element:', err);
+              this.elementsLoading.delete(componentTag);
+              return Promise.reject(err);
+            }
           })
           .catch(err => {
+            console.error('Error loading module:', err);
             this.elementsLoading.delete(componentTag);
             return Promise.reject(err);
           });
