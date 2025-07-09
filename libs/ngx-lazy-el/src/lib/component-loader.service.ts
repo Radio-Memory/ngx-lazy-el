@@ -1,7 +1,8 @@
 import {
   Injectable,
   Injector,
-  Inject
+  Inject,
+  NgModuleRef
 } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { LazyComponentDef, LAZY_CMPS_PATH_TOKEN } from './tokens';
@@ -130,35 +131,31 @@ export class ComponentLoaderService {
               injector: this.injector
             });
 
-              // define the Angular Element
-              customElements!.define(componentTag, CustomElement);
-              customElements
-                .whenDefined(componentTag)
-                .then(() => {
-                  // remember for next time
-                  this.loadedCmps.set(componentTag, elementModuleRef);
-                  // instantiate the component
-                  const componentInstance = createInstance
-                    ? document.createElement(componentTag)
-                    : null;
-                  // const componentInstance = null;
-                  resolve({
-                    selector: componentTag,
-                    componentInstance
-                  });
-                })
-                .then(() => {
-                  this.elementsLoading.delete(componentTag);
-                  this.componentsToLoad.delete(componentTag);
-                })
-                .catch(err => {
-                  this.elementsLoading.delete(componentTag);
-                  return Promise.reject(err);
+            // define the Angular Element
+            customElements!.define(componentTag, CustomElement);
+            customElements
+              .whenDefined(componentTag)
+              .then(() => {
+                // remember for next time
+                this.loadedCmps.set(componentTag, elementModule);
+                // instantiate the component
+                const componentInstance = createInstance
+                  ? document.createElement(componentTag)
+                  : null;
+                // const componentInstance = null;
+                resolve({
+                  selector: componentTag,
+                  componentInstance
                 });
-            } catch (err) {
-              reject(err);
-              throw err;
-            }
+              })
+              .then(() => {
+                this.elementsLoading.delete(componentTag);
+                this.componentsToLoad.delete(componentTag);
+              })
+              .catch(err => {
+                this.elementsLoading.delete(componentTag);
+                return Promise.reject(err);
+              });
           })
           .catch(err => {
             this.elementsLoading.delete(componentTag);
