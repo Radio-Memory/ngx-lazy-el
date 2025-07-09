@@ -4,9 +4,8 @@ import { Cmp1Component } from './cmp1.component';
 import { Cmp2Component } from './cmp2.component';
 
 @NgModule({
-  declarations: [Cmp1Component, Cmp2Component],
-  imports: [CommonModule],
-  entryComponents: [Cmp1Component, Cmp2Component]
+    declarations: [Cmp1Component, Cmp2Component],
+    imports: [CommonModule]
 })
 export class MultiComponentsModule {
   customElementComponent: { [prop: string]: Type<any> } = {

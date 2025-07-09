@@ -4,8 +4,9 @@ import { NgxLazyElModule } from './ngx-lazy-el.module';
 describe('NgxLazyElModule', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [NgxLazyElModule]
-    }).compileComponents();
+    imports: [NgxLazyElModule],
+    teardown: { destroyAfterEach: false }
+}).compileComponents();
   }));
 
   it('should create', () => {

@@ -5,9 +5,8 @@ import { SimpleHelloWorldComponent } from './simple-hello-world.component';
 import { createCustomElement } from '@angular/elements';
 
 @NgModule({
-  declarations: [SimpleHelloWorldComponent],
-  imports: [CommonModule, SharedModule],
-  entryComponents: [SimpleHelloWorldComponent]
+    declarations: [SimpleHelloWorldComponent],
+    imports: [CommonModule, SharedModule]
 })
 export class SimpleHelloWorldModule {
   constructor(injector: Injector) {

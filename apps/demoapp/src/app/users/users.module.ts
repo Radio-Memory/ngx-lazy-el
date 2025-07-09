@@ -4,9 +4,8 @@ import { SharedModule } from '../shared';
 import { UserListComponent } from './user-list/user-list.component';
 
 @NgModule({
-  declarations: [UserListComponent],
-  imports: [CommonModule, SharedModule],
-  entryComponents: [UserListComponent]
+    declarations: [UserListComponent],
+    imports: [CommonModule, SharedModule]
 })
 export class UsersModule {
   customElementComponent: Type<any> = UserListComponent;
