@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/radiomemory/ngx-lazy-el"
+    "url": "https://github.com/Radio-Memory/ngx-lazy-el"
   },
   "dependencies": {
     "tslib": "^2.0.0"
