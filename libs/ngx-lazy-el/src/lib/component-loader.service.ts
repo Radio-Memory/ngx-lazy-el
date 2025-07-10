@@ -1,13 +1,19 @@
 import {
   Injectable,
   Injector,
-  Inject
+  Inject,
+  NgModuleRef,
+  Compiler
 } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { LazyComponentDef, LAZY_CMPS_PATH_TOKEN } from './tokens';
 import { Observable, of, from } from 'rxjs';
 import { LazyCmpLoadedEvent } from './lazy-cmp-loaded-event';
 import { LoadChildrenCallback } from '@angular/router';
+
+interface LazyModule {
+  customElementComponent: any;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +25,7 @@ export class ComponentLoaderService {
 
   constructor(
     private injector: Injector,
+    private compiler: Compiler,
     @Inject(LAZY_CMPS_PATH_TOKEN)
     elementModulePaths: {
       selector: string;
@@ -96,7 +103,7 @@ export class ComponentLoaderService {
    * @param componentTag selector of the component to load
    * @param createInstance if true, creates an element and returns it in the promise
    */
-  loadComponent(
+  async loadComponent(
     componentTag: string,
     createInstance = true
   ): Promise<LazyCmpLoadedEvent> {
@@ -106,70 +113,56 @@ export class ComponentLoaderService {
 
     if (this.componentsToLoad.has(componentTag)) {
       const cmpRegistryEntry = this.componentsToLoad.get(componentTag);
-
       const path = cmpRegistryEntry.loadChildren;
 
-      const loadPromise = new Promise<LazyCmpLoadedEvent>((resolve, reject) => {
-        (path() as Promise<any>)
-          .then(elementModule => {
-            let customElementComponent;
+      const loadPromise = new Promise<LazyCmpLoadedEvent>(async (resolve, reject) => {
+        try {
+          const elementModule = await (path() as Promise<any>);
+          const moduleFactory = this.compiler.compileModuleSync(elementModule);
+          const moduleRef = moduleFactory.create(this.injector);
+          const lazyModuleInstance = moduleRef.instance as LazyModule;
+          let customElementComponent;
 
-            if (typeof elementModule.customElementComponent === 'object') {
-              customElementComponent =
-                elementModule.customElementComponent[componentTag];
-              if (!customElementComponent) {
-                throw `You specified multiple component elements in module ${elementModule} but there was no match for tag ${componentTag} in ${JSON.stringify(
-                  elementModule.customElementComponent
-                )}. Make sure the selector in the module is aligned with the one specified in the lazy module definition.`;
-              }
-            } else {
-              customElementComponent = elementModule.customElementComponent;
+          if (typeof lazyModuleInstance.customElementComponent === 'object') {
+            customElementComponent =
+              lazyModuleInstance.customElementComponent[componentTag];
+            if (!customElementComponent) {
+              throw `You specified multiple component elements in module ${elementModule} but there was no match for tag ${componentTag} in ${JSON.stringify(
+                lazyModuleInstance.customElementComponent
+              )}. Make sure the selector in the module is aligned with the one specified in the lazy module definition.`;
             }
+          } else {
+            customElementComponent = lazyModuleInstance.customElementComponent;
+          }
 
-            const CustomElement = createCustomElement(customElementComponent, {
-              injector: this.injector
-            });
-
-              // define the Angular Element
-              customElements!.define(componentTag, CustomElement);
-              customElements
-                .whenDefined(componentTag)
-                .then(() => {
-                  // remember for next time
-                  this.loadedCmps.set(componentTag, elementModuleRef);
-                  // instantiate the component
-                  const componentInstance = createInstance
-                    ? document.createElement(componentTag)
-                    : null;
-                  // const componentInstance = null;
-                  resolve({
-                    selector: componentTag,
-                    componentInstance
-                  });
-                })
-                .then(() => {
-                  this.elementsLoading.delete(componentTag);
-                  this.componentsToLoad.delete(componentTag);
-                })
-                .catch(err => {
-                  this.elementsLoading.delete(componentTag);
-                  return Promise.reject(err);
-                });
-            } catch (err) {
-              reject(err);
-              throw err;
-            }
-          })
-          .catch(err => {
-            this.elementsLoading.delete(componentTag);
-            return Promise.reject(err);
+          const CustomElement = createCustomElement(customElementComponent, {
+            injector: this.injector
           });
+
+          customElements!.define(componentTag, CustomElement);
+          await customElements.whenDefined(componentTag);
+
+          this.loadedCmps.set(componentTag, elementModule);
+          const componentInstance = createInstance
+            ? document.createElement(componentTag)
+            : null;
+
+          resolve({
+            selector: componentTag,
+            componentInstance
+          });
+
+          this.elementsLoading.delete(componentTag);
+          this.componentsToLoad.delete(componentTag);
+        } catch (err) {
+          this.elementsLoading.delete(componentTag);
+          reject(err);
+        }
       });
 
       this.elementsLoading.set(componentTag, loadPromise);
       return loadPromise;
     } else if (this.loadedCmps.has(componentTag)) {
-      // component already loaded
       return new Promise(resolve => {
         resolve({
           selector: componentTag,

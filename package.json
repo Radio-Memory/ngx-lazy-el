@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --host 0.0.0.0 --disable-host-check",
     "build": "ng build --prod",
     "build:lib": "ng build ngx-lazy-el && cp -v *.md LICENSE dist/libs/ngx-lazy-el",
     "publish:lib": "./tools/scripts/publishLib.sh",
@@ -35,19 +35,19 @@
   "dependencies": {
     "@nrwl/angular": "8.4.13",
     "@angular/animations": "^10.2.5",
-    "@angular/cdk": "~7.3.7",
+    "@angular/cdk": "~10.2.5",
     "@angular/common": "^10.2.5",
     "@angular/compiler": "^10.2.5",
     "@angular/core": "^10.2.5",
     "@angular/elements": "^10.2.5",
     "@angular/forms": "^10.2.5",
-    "@angular/material": "^7.3.7",
+    "@angular/material": "^10.2.5",
     "@angular/platform-browser": "^10.2.5",
     "@angular/platform-browser-dynamic": "^10.2.5",
     "@angular/router": "^10.2.5",
-    "@ngrx/effects": "8.1.0",
-    "@ngrx/router-store": "8.1.0",
-    "@ngrx/store": "8.1.0",
+    "@ngrx/effects": "~10.1.2",
+    "@ngrx/router-store": "~10.1.2",
+    "@ngrx/store": "~10.1.2",
     "@webcomponents/custom-elements": "^1.2.4",
     "core-js": "^2.5.4",
     "document-register-element": "^1.7.2",
@@ -65,7 +65,7 @@
     "@angular/cli": "10.2.4",
     "@angular/compiler-cli": "^10.2.5",
     "@angular/language-service": "^10.2.5",
-    "@ngrx/store-devtools": "8.1.0",
+    "@ngrx/store-devtools": "~10.1.2",
     "ng-packagr": "^10.1.0",
     "jasmine-marbles": "0.4.0",
     "@types/jasmine": "~2.8.6",
@@ -91,6 +91,6 @@
     "@types/jest": "24.0.9",
     "jest-preset-angular": "7.0.0",
     "dotenv": "6.2.0",
-    "@ngrx/schematics": "8.1.0"
+    "@ngrx/schematics": "~10.1.2"
   }
 }
