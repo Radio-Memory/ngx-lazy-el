@@ -6,11 +6,6 @@ Easy lazy loading components 💪 by Angular Elements.
 
 ## How to use it
 
-Also check out my talks about using this library
-
-- [ngRome 2019 - Lazy Loading on Steroids (with Angular Elements)](https://youtu.be/weVK53N-x-8)
-- [JSBE.io - Lazy Loading on Steroids with NG Elements](https://youtu.be/-YdM-1xZBoI)
-
 
 ### Install Angular Elements on your project
 
@@ -20,18 +15,18 @@ This library depends on Angular Elements. You can install that via
 $ ng add @angular/elements
 ```
 
-### Install ngx-lazy-el
+### Install ngx-lazy-el-v10
 
 Install the library from npm.
 
 ```
-$ npm install @juristr/ngx-lazy-el
+$ npm install @radiomemory/ngx-lazy-el-v10
 ```
 
 or
 
 ```
-$ yarn add @juristr/ngx-lazy-el
+$ yarn add @radiomemory/ngx-lazy-el-v10
 ```
 
 ### Lazy load a component
@@ -103,7 +98,3 @@ Now you can just use the Custom Element by applying the `*ngxLazyEl` directive.
 ```
 
 If it is behind a `*ngIf` or other non-visible component, the `app-hello-world` will be lazy loaded on the fly.
-
-## Questions?
-
-Open an [issue](https://github.com/juristr/ngx-lazy-el/issues) or ping me [on Twitter](https://twitter.com/juristr).

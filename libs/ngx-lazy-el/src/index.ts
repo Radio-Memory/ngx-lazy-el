@@ -1,4 +1,5 @@
 export * from './lib/ngx-lazy-el.module';
+export * from './lib/lazy-load.directive';
 
 export * from './lib/lazy-cmp-loaded-event';
 export { LazyComponentDef } from './lib/tokens';
