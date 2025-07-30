@@ -2,7 +2,9 @@ import {
   Injectable,
   Injector,
   Inject,
-  NgModuleRef
+  NgModuleRef,
+  createNgModule,
+  Type
 } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { LazyComponentDef, LAZY_CMPS_PATH_TOKEN } from './tokens';
@@ -112,20 +114,23 @@ export class ComponentLoaderService {
 
             const loadPromise = new Promise<LazyCmpLoadedEvent>((resolve, reject) => {
         (path() as Promise<any>)
-          .then(elementModule => {
+          .then(async (elementModuleOrType) => {
             try {
+              const elementModuleRef = createNgModule(elementModuleOrType, this.injector);
+              const moduleInstance = elementModuleRef.instance as any;
               let customElementComponent;
 
-              if (typeof elementModule.customElementComponent === 'object') {
-                customElementComponent =
-                  elementModule.customElementComponent[componentTag];
+              if (typeof moduleInstance.customElementComponent === 'object') {
+                customElementComponent = moduleInstance.customElementComponent[componentTag];
                 if (!customElementComponent) {
-                  throw `You specified multiple component elements in module ${elementModule} but there was no match for tag ${componentTag} in ${JSON.stringify(
-                    elementModule.customElementComponent
-                  )}. Make sure the selector in the module is aligned with the one specified in the lazy module definition.`;
+                  throw `You specified multiple component elements in module ${elementModuleRef.instance.constructor.name} but there was no match for tag ${componentTag}.`;
                 }
               } else {
-                customElementComponent = elementModule.customElementComponent;
+                customElementComponent = moduleInstance.customElementComponent;
+              }
+
+              if (!customElementComponent) {
+                throw new Error(`Could not find a customElementComponent property in the lazy-loaded module for selector "${componentTag}".`);
               }
 
               const CustomElement = createCustomElement(customElementComponent, {
@@ -138,7 +143,7 @@ export class ComponentLoaderService {
                 .whenDefined(componentTag)
                 .then(() => {
                   // remember for next time
-                  this.loadedCmps.set(componentTag, elementModule);
+                  this.loadedCmps.set(componentTag, elementModuleRef);
                   // instantiate the component
                   const componentInstance = createInstance
                     ? document.createElement(componentTag)
