@@ -7,11 +7,7 @@ import {
   Output,
   ChangeDetectorRef,
   ViewContainerRef,
-  TemplateRef,
-  ContentChild,
-  ContentChildren,
-  AfterContentInit,
-  Input
+  TemplateRef
 } from '@angular/core';
 import { ComponentLoaderService } from './component-loader.service';
 import { LazyCmpLoadedEvent } from './lazy-cmp-loaded-event';

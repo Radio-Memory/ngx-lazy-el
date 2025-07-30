@@ -154,7 +154,8 @@
   "packageManager": "yarn",
   "schematicCollections": [
     "@nrwl/angular"
-  ]
+  ],
+  "analytics": false
  },
  "schematics": {
   "@nrwl/schematics:application": {

@@ -1,7 +1,8 @@
 import {
   Injectable,
   Injector,
-  Inject
+  Inject,
+  NgModuleRef
 } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { LazyComponentDef, LAZY_CMPS_PATH_TOKEN } from './tokens';
@@ -109,26 +110,27 @@ export class ComponentLoaderService {
 
       const path = cmpRegistryEntry.loadChildren;
 
-      const loadPromise = new Promise<LazyCmpLoadedEvent>((resolve, reject) => {
+            const loadPromise = new Promise<LazyCmpLoadedEvent>((resolve, reject) => {
         (path() as Promise<any>)
           .then(elementModule => {
-            let customElementComponent;
+            try {
+              let customElementComponent;
 
-            if (typeof elementModule.customElementComponent === 'object') {
-              customElementComponent =
-                elementModule.customElementComponent[componentTag];
-              if (!customElementComponent) {
-                throw `You specified multiple component elements in module ${elementModule} but there was no match for tag ${componentTag} in ${JSON.stringify(
-                  elementModule.customElementComponent
-                )}. Make sure the selector in the module is aligned with the one specified in the lazy module definition.`;
+              if (typeof elementModule.customElementComponent === 'object') {
+                customElementComponent =
+                  elementModule.customElementComponent[componentTag];
+                if (!customElementComponent) {
+                  throw `You specified multiple component elements in module ${elementModule} but there was no match for tag ${componentTag} in ${JSON.stringify(
+                    elementModule.customElementComponent
+                  )}. Make sure the selector in the module is aligned with the one specified in the lazy module definition.`;
+                }
+              } else {
+                customElementComponent = elementModule.customElementComponent;
               }
-            } else {
-              customElementComponent = elementModule.customElementComponent;
-            }
 
-            const CustomElement = createCustomElement(customElementComponent, {
-              injector: this.injector
-            });
+              const CustomElement = createCustomElement(customElementComponent, {
+                injector: this.injector
+              });
 
               // define the Angular Element
               customElements!.define(componentTag, CustomElement);
@@ -136,7 +138,7 @@ export class ComponentLoaderService {
                 .whenDefined(componentTag)
                 .then(() => {
                   // remember for next time
-                  this.loadedCmps.set(componentTag, elementModuleRef);
+                  this.loadedCmps.set(componentTag, elementModule);
                   // instantiate the component
                   const componentInstance = createInstance
                     ? document.createElement(componentTag)

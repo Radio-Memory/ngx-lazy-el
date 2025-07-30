@@ -1,0 +1,38 @@
+{
+  "name": "@juristr/ngx-lazy-el",
+  "version": "1.0.1",
+  "author": {
+    "name": "Juri Strumpflohner",
+    "url": "https://juristr.com",
+    "email": "info@juristr.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/juristr/ngx-lazy-el"
+  },
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
+  "peerDependencies": {
+    "@angular/common": "^8.0.0",
+    "@angular/core": "^8.0.0",
+    "@angular/elements": "^8.0.0"
+  },
+  "module": "fesm2022/juristr-ngx-lazy-el.mjs",
+  "typings": "index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./index.d.ts",
+      "esm2022": "./esm2022/juristr-ngx-lazy-el.mjs",
+      "esm": "./esm2022/juristr-ngx-lazy-el.mjs",
+      "default": "./fesm2022/juristr-ngx-lazy-el.mjs"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "prepublishOnly": "node --eval \"console.error('ERROR: Trying to publish a package that has been compiled by Ivy in full compilation mode. This is not allowed.\\nPlease delete and rebuild the package with Ivy partial compilation mode, before attempting to publish.\\n')\" && exit 1"
+  }
+}
